@@ -19,6 +19,8 @@ func NewLocal(baseURL string) *Local {
 		baseURL = "http://" + baseURL
 	}
 
+	baseURL = strings.TrimRight(baseURL, "/")
+
 	return &Local{
 		Client: resttest.NewClient(baseURL),
 	}

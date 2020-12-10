@@ -152,8 +152,8 @@ github.com/swaggest/refl v0.1.2/go.mod h1:kmYWhxNEvjfRDdMRqpaR/vLULk/SotJs9HFUCI
 github.com/swaggest/refl v0.1.3/go.mod h1:kmYWhxNEvjfRDdMRqpaR/vLULk/SotJs9HFUCIVMK8o=
 github.com/swaggest/refl v0.1.6 h1:z5drruoOSfWoB4aPuL22cMB5suLuxXS22oQkpTQ093o=
 github.com/swaggest/refl v0.1.6/go.mod h1:XqZZZ8i6hptbvd3A8pvXkF0ontg0Wziqe7OFAnvAZMk=
-github.com/swaggest/rest v0.1.5 h1:agXTVTcNgbged8U6woxHeDxT/Q7xBEWtjKJCgGLAe8g=
-github.com/swaggest/rest v0.1.5/go.mod h1:TjP5yVyaWYCp7V3RktAc/94reXuqJTt5GjwxdKonWeo=
+github.com/swaggest/rest v0.1.6 h1:ARfX0OAkfAC9hfgDoIH9737yUl2zUxtA3SzVPXqhWLs=
+github.com/swaggest/rest v0.1.6/go.mod h1:TjP5yVyaWYCp7V3RktAc/94reXuqJTt5GjwxdKonWeo=
 github.com/swaggest/swgen v0.6.20/go.mod h1:ipkZNfwztgRfbOWUllLZawfmxXprT8flqNJO9XhoMwM=
 github.com/swaggest/swgen v0.6.23/go.mod h1:gj2yCLONy3kosKjwRtQeT5O9qqlhUvXAiDnbVwBUNFM=
 github.com/swaggest/swgen v0.6.27/go.mod h1:tQLsoQVLcvtAMzNbm26JbWXDHZM4BBRuI5nemk3gEDw=
