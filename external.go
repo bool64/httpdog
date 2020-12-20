@@ -3,6 +3,7 @@ package httpdog
 import (
 	"fmt"
 
+	"github.com/bool64/shared"
 	"github.com/cucumber/godog"
 	"github.com/swaggest/rest/resttest"
 )
@@ -13,6 +14,7 @@ type External struct {
 	mocks   map[string]*resttest.ServerMock
 
 	OnError func(err error)
+	Vars    *shared.Vars
 }
 
 // RegisterSteps adds steps to godog scenario context to serve outgoing requests with mocked data.
@@ -121,6 +123,7 @@ func (e *External) Add(service string, options ...func(mock *resttest.ServerMock
 	mock, url := resttest.NewServerMock()
 
 	mock.OnError = e.OnError
+	mock.JSONComparer.Vars = e.Vars
 
 	for _, option := range options {
 		option(mock)
