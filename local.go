@@ -123,6 +123,10 @@ type Local struct {
 func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 	s.BeforeScenario(func(_ *godog.Scenario) {
 		l.Reset()
+
+		if l.JSONComparer.Vars != nil {
+			l.JSONComparer.Vars.Reset()
+		}
 	})
 
 	s.Step(`^I request HTTP endpoint with method "([^"]*)" and URI "([^"]*)"$`, l.iRequestWithMethodAndURI)

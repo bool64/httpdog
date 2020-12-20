@@ -99,6 +99,10 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 		for _, mock := range e.mocks {
 			mock.ResetExpectations()
 		}
+
+		if e.Vars != nil {
+			e.Vars.Reset()
+		}
 	})
 
 	s.AfterScenario(func(s *godog.Scenario, _ error) {
