@@ -51,6 +51,9 @@ func setExpectations(mock *resttest.ServerMock, concurrencyLevel int) {
 		Method:       http.MethodGet,
 		RequestURI:   "/get-something?foo=bar",
 		ResponseBody: []byte(`[{"some":"json"}]`),
+		ResponseHeader: map[string]string{
+			"Content-Type": "application/json",
+		},
 	})
 
 	mock.Expect(resttest.Expectation{
@@ -71,12 +74,18 @@ func setExpectations(mock *resttest.ServerMock, concurrencyLevel int) {
 		},
 		RequestBody:  []byte(`[{"some":"json"}]`),
 		ResponseBody: []byte(`{"status":"ok"}`),
+		ResponseHeader: map[string]string{
+			"Content-Type": "application/json",
+		},
 	})
 
 	del := resttest.Expectation{
 		Method:     http.MethodDelete,
 		RequestURI: "/delete-something",
 		Status:     http.StatusNoContent,
+		ResponseHeader: map[string]string{
+			"Content-Type": "application/json",
+		},
 	}
 
 	// Expecting 2 similar requests.
@@ -101,6 +110,9 @@ func setExpectations(mock *resttest.ServerMock, concurrencyLevel int) {
 		},
 		RequestBody:  []byte(`[{"some":"json5"}]`),
 		ResponseBody: []byte(`{"status":"ok"}`),
+		ResponseHeader: map[string]string{
+			"Content-Type": "application/json",
+		},
 	})
 
 	// Expecting request does not contain a valid json

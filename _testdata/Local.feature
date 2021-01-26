@@ -12,6 +12,8 @@ Feature: HTTP Service
     ]
     """
 
+    And I should have response with header "Content-Type: application/json"
+
   Scenario: Bad request
     When I request HTTP endpoint with method "DELETE" and URI "/bad-request"
 
@@ -60,6 +62,8 @@ Feature: HTTP Service
     """
     {"status":"failed"}
     """
+
+    And I should have other responses with header "Content-Type: application/json"
 
   Scenario: POST with body with json5 comments
     When I request HTTP endpoint with method "POST" and URI "/with-json5-body"

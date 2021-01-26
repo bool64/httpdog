@@ -97,15 +97,18 @@ type Local struct {
 //		path/to/file.json
 //		"""
 //
-// Status can be defined with either phrase or numeric code.
+// Status can be defined with either phrase or numeric code. Also you can set response header expectations.
 //
 //		Then I should have response with status "OK"
+//		And I should have response with header "Content-Type: application/json"
+//		And I should have response with header "X-Header: abc"
 //
 // In an idempotent mode you can set expectations for statuses of other responses.
 //
 //		Then I should have response with status "204"
 //
 //		And I should have other responses with status "Not Found"
+//		And I should have other responses with header "Content-Type: application/json"
 //
 // And for bodies of other responses.
 //
@@ -137,10 +140,12 @@ func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 	s.Step(`^I concurrently request idempotent HTTP endpoint$`, l.iRequestWithConcurrency)
 
 	s.Step(`^I should have response with status "([^"]*)"$`, l.iShouldHaveResponseWithStatus)
+	s.Step(`^I should have response with header "([^"]*): ([^"]*)"$`, l.iShouldHaveResponseWithHeader)
 	s.Step(`^I should have response with body from file$`, l.iShouldHaveResponseWithBodyFromFile)
 	s.Step(`^I should have response with body$`, l.iShouldHaveResponseWithBody)
 
 	s.Step(`^I should have other responses with status "([^"]*)"$`, l.iShouldHaveOtherResponsesWithStatus)
+	s.Step(`^I should have other responses with header "([^"]*): ([^"]*)"$`, l.iShouldHaveOtherResponsesWithHeader)
 	s.Step(`^I should have other responses with body$`, l.iShouldHaveOtherResponsesWithBody)
 	s.Step(`^I should have other responses with body from file$`, l.iShouldHaveOtherResponsesWithBodyFromFile)
 }
@@ -236,6 +241,14 @@ func (l *Local) iShouldHaveResponseWithStatus(statusOrCode string) error {
 	}
 
 	return l.ExpectResponseStatus(code)
+}
+
+func (l *Local) iShouldHaveOtherResponsesWithHeader(key, value string) error {
+	return l.ExpectOtherResponsesHeader(key, value)
+}
+
+func (l *Local) iShouldHaveResponseWithHeader(key, value string) error {
+	return l.ExpectResponseHeader(key, value)
 }
 
 func (l *Local) iShouldHaveResponseWithBody(bodyDoc *godog.DocString) error {
