@@ -117,6 +117,15 @@ path/to/file.json
 """
 ```
 
+Optionally response headers can be asserted.
+
+```gherkin
+Then I should have response with header "Content-Type: application/json"
+
+And I should have other responses with header "Content-Type: text/plain"
+And I should have other responses with header "X-Header: abc"
+```
+
 ### External Services
 
 In simple case you can define expected URL and response.

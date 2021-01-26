@@ -53,6 +53,8 @@ func TestRegisterExternal(t *testing.T) {
 }
 
 func callServices(t *testing.T, someServiceURL, anotherServiceURL string) func() error {
+	t.Helper()
+
 	return func() error {
 		// Hitting `"some-service" receives "GET" request "/get-something?foo=bar"`.
 		req, err := http.NewRequest(http.MethodGet, someServiceURL+"/get-something?foo=bar", nil)
