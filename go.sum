@@ -31,7 +31,7 @@ github.com/fsnotify/fsnotify v1.4.7 h1:IXs+QLmnXW2CcXuY+8Mzv/fWEsPGWxqefPtCP5CnV
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/fsnotify/fsnotify v1.4.9 h1:hsms1Qyu0jgnwNXIxa+/V/PDsU6CfLf6CNO8H7IWoS4=
 github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4IgpuI1SZQ=
-github.com/go-chi/chi v4.1.2+incompatible/go.mod h1:eB3wogJHnLi3x/kFX2A+IbTBlXxmMeXJVKy9tTv1XzQ=
+github.com/go-chi/chi v1.5.1/go.mod h1:REp24E+25iKvxgeTfHmdUoL5x15kBiDBlnIl5bCwe2k=
 github.com/gofrs/uuid v3.2.0+incompatible h1:y12jRkkFxsd7GpqdSZ+/KCs/fJbqpEXSGd4+jfEaewE=
 github.com/gofrs/uuid v3.2.0+incompatible/go.mod h1:b2aQJv3Z4Fp6yNu3cdSllBxTCLRxnplIgP/c0N/04lM=
 github.com/gofrs/uuid v3.3.0+incompatible h1:8K4tyRfvU1CYPgJsveYFQMhpFd/wXNM7iK6rR7UHz84=
@@ -152,11 +152,12 @@ github.com/swaggest/assertjson v1.6.0 h1:/seQ1631sTRXAURjCNbPebYb+wtxnXhXg1BRIQU
 github.com/swaggest/assertjson v1.6.0/go.mod h1:2dZU3TJoGcH+QPrekon0+zG5hJnZUpdEAxiLoxmJALI=
 github.com/swaggest/assertjson v1.6.2 h1:4v4ueAy466hisGIeQ2WmFDyOJiE0YrCDDRaSXor642I=
 github.com/swaggest/assertjson v1.6.2/go.mod h1:7/CWJAKS2t0KXIGsh5no8qyRXluwQ4fVduV3+Jue/MY=
-github.com/swaggest/form v3.6.4+incompatible/go.mod h1:eTJPpSayjnJlOQQbDYsSHlbREbSAtudNW/Y6HouVWr0=
+github.com/swaggest/form v1.11.1/go.mod h1:XI/xmw62iJuKxhbqvxOj1ri7VJFAaeRsX5qNdHVkbB4=
 github.com/swaggest/jsonschema-go v0.2.1/go.mod h1:QFauBdPTrU1UltwocM5FzOWnVjVVtcWkJWG3NlK9sV0=
 github.com/swaggest/jsonschema-go v0.2.4/go.mod h1:m4VV88Gbi7lCrt9ckJzigK1rMlEeFjdZUkJr1o5MnDE=
 github.com/swaggest/jsonschema-go v0.3.7/go.mod h1:TrWgbug4p2ZgcxnHDz+CvYvEtJ5KckL/XOV4mSR6FGw=
 github.com/swaggest/jsonschema-go v0.3.13/go.mod h1:INO3Dt0DeyNCbQbqMXNpMQ489BcyRtSb/k62OfmHbpY=
+github.com/swaggest/jsonschema-go v0.3.14/go.mod h1:ohKskUhEMf/bhSi2zY0A5aLZoMz7ZkEafEvniNKBaQg=
 github.com/swaggest/openapi-go v0.1.3/go.mod h1:Zx4ZgJ7XvlFH9wCOHE7u8RAjLfiHAnCHeaD5kUDujVM=
 github.com/swaggest/openapi-go v0.1.13/go.mod h1:fju3Ka5zb8qBKf4789zLNVUqITydWLDjtPloZhhYHL8=
 github.com/swaggest/openapi-go v0.2.9/go.mod h1:tr1pt/xuYlmgk8HZDjfmx/L7zfKLCmxR7ClvSAVGdW4=
@@ -165,8 +166,8 @@ github.com/swaggest/refl v0.1.2/go.mod h1:kmYWhxNEvjfRDdMRqpaR/vLULk/SotJs9HFUCI
 github.com/swaggest/refl v0.1.3/go.mod h1:kmYWhxNEvjfRDdMRqpaR/vLULk/SotJs9HFUCIVMK8o=
 github.com/swaggest/refl v0.1.6 h1:z5drruoOSfWoB4aPuL22cMB5suLuxXS22oQkpTQ093o=
 github.com/swaggest/refl v0.1.6/go.mod h1:XqZZZ8i6hptbvd3A8pvXkF0ontg0Wziqe7OFAnvAZMk=
-github.com/swaggest/rest v0.1.15 h1:yUgACtDUBQOz9xD6WZ5/dv9H9B6KfTEFQXDO41e3JCY=
-github.com/swaggest/rest v0.1.15/go.mod h1:2RjJCZZmrLlVqlu24zopDz3Tbunc3flm1hSMOXrDDUE=
+github.com/swaggest/rest v0.1.18 h1:GHyKe3gIj7YO5+nFHlrMfmORpCxr1y7cZpE0HLxBuHM=
+github.com/swaggest/rest v0.1.18/go.mod h1:2eLFIhNisunMFgjfTjSLmLDxREWTgIrE6h9J1vfUIzo=
 github.com/swaggest/swgen v0.6.20/go.mod h1:ipkZNfwztgRfbOWUllLZawfmxXprT8flqNJO9XhoMwM=
 github.com/swaggest/swgen v0.6.23/go.mod h1:gj2yCLONy3kosKjwRtQeT5O9qqlhUvXAiDnbVwBUNFM=
 github.com/swaggest/swgen v0.6.27/go.mod h1:tQLsoQVLcvtAMzNbm26JbWXDHZM4BBRuI5nemk3gEDw=
@@ -274,7 +275,6 @@ gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntN
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
 gopkg.in/fsnotify.v1 v1.4.7 h1:xOHLXZwVvI9hhs+cLKq5+I5onOuwQLhQwiu63xxlHs4=
 gopkg.in/fsnotify.v1 v1.4.7/go.mod h1:Tz8NjZHkW78fSQdbUxIjBTcgA1z1m8ZHf0WmKUhAMys=
-gopkg.in/go-playground/assert.v1 v1.2.1/go.mod h1:9RXL0bg/zibRAgZUYszZSwO/z8Y/a8bDuhia5mkpMnE=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 h1:uRGJdciOHaEIrze2W8Q3AKkepLTh2hOroT7a+7czfdQ=
 gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7/go.mod h1:dt/ZhP58zS4L8KSrWDmTeBkI65Dw0HsyUHuEVlX15mw=
 gopkg.in/yaml.v2 v2.2.1/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
