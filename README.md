@@ -1,6 +1,6 @@
 # Cucumber HTTP steps for Go
 
-[![Build Status](https://github.com/bool64/httpdog/workflows/test/badge.svg)](https://github.com/bool64/httpdog/actions?query=branch%3Amaster+workflow%3Atest)
+[![Build Status](https://github.com/bool64/httpdog/workflows/test-unit/badge.svg)](https://github.com/bool64/httpdog/actions?query=branch%3Amaster+workflow%3Atest-unit)
 [![Coverage Status](https://codecov.io/gh/bool64/httpdog/branch/master/graph/badge.svg)](https://codecov.io/gh/bool64/httpdog)
 [![GoDevDoc](https://img.shields.io/badge/dev-doc-00ADD8?logo=go)](https://pkg.go.dev/github.com/bool64/httpdog)
 [![Time Tracker](https://wakatime.com/badge/github/bool64/httpdog.svg)](https://wakatime.com/badge/github/bool64/httpdog)
