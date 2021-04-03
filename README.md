@@ -28,6 +28,12 @@ An additional header can be supplied. For multiple headers, call step multiple t
 And I request HTTP endpoint with header "X-Foo: bar"
 ```
 
+An additional cookie can be supplied. For multiple cookies, call step multiple times.
+
+```gherkin
+And I request HTTP endpoint with cookie "name: value"
+```
+
 Optionally request body can be configured. If body is a valid JSON5 payload, it will be converted to JSON before use.
 Otherwise, body is used as is.
 
