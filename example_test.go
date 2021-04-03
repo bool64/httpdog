@@ -39,9 +39,8 @@ func ExampleNewLocal() {
 			Output: ioutil.Discard,
 		},
 	}
-	status := suite.Run()
 
-	if status != 0 {
+	if suite.Run() != 0 {
 		fmt.Println("test failed")
 	} else {
 		fmt.Println("test passed")

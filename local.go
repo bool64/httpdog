@@ -44,6 +44,10 @@ type Local struct {
 //
 //		And I request HTTP endpoint with header "X-Foo: bar"
 //
+// An additional cookie can be supplied. For multiple cookie, call step multiple times.
+//
+//		And I request HTTP endpoint with cookie "name: value"
+//
 // Optionally request body can be configured. If body is a valid JSON5 payload, it will be converted to JSON before use.
 // Otherwise, body is used as is.
 //
@@ -136,6 +140,7 @@ func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 	s.Step(`^I request HTTP endpoint with body$`, l.iRequestWithBody)
 	s.Step(`^I request HTTP endpoint with body from file$`, l.iRequestWithBodyFromFile)
 	s.Step(`^I request HTTP endpoint with header "([^"]*): ([^"]*)"$`, l.iRequestWithHeader)
+	s.Step(`^I request HTTP endpoint with cookie "([^"]*): ([^"]*)"$`, l.iRequestWithCookie)
 
 	s.Step(`^I concurrently request idempotent HTTP endpoint$`, l.iRequestWithConcurrency)
 
@@ -197,6 +202,12 @@ func (l *Local) iRequestWithBody(bodyDoc *godog.DocString) error {
 
 func (l *Local) iRequestWithHeader(key, value string) error {
 	l.WithHeader(key, value)
+
+	return nil
+}
+
+func (l *Local) iRequestWithCookie(name, value string) error {
+	l.WithCookie(name, value)
 
 	return nil
 }

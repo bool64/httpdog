@@ -39,9 +39,8 @@ func TestRegisterExternal(t *testing.T) {
 			Randomize: time.Now().UTC().UnixNano(),
 		},
 	}
-	status := suite.Run()
 
-	if status != 0 {
+	if suite.Run() != 0 {
 		t.Fatal("unexpected error")
 	}
 

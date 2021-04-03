@@ -19,6 +19,10 @@ Feature: HTTP Service
 
     And I request HTTP endpoint with header "X-Foo: bar"
 
+    And I request HTTP endpoint with cookie "c1: v1"
+
+    And I request HTTP endpoint with cookie "c2: v2"
+
     Then I should have response with status "Bad Request"
 
     And I should have response with body from file

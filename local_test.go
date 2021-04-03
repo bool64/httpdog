@@ -37,9 +37,8 @@ func TestLocal_RegisterSteps(t *testing.T) {
 			Paths:  []string{"_testdata/Local.feature"},
 		},
 	}
-	status := suite.Run()
 
-	if status != 0 {
+	if suite.Run() != 0 {
 		t.Fatal("test failed")
 	}
 
@@ -61,6 +60,10 @@ func setExpectations(mock *resttest.ServerMock, concurrencyLevel int) {
 		RequestURI: "/bad-request",
 		RequestHeader: map[string]string{
 			"X-Foo": "bar",
+		},
+		RequestCookie: map[string]string{
+			"c1": "v1",
+			"c2": "v2",
 		},
 		ResponseBody: []byte(`{"error":"oops"}`),
 		Status:       http.StatusBadRequest,
