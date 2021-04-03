@@ -11,5 +11,5 @@ require (
 	github.com/hashicorp/go-uuid v1.0.2 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/swaggest/assertjson v1.6.4
-	github.com/swaggest/rest v0.2.1-0.20210403115945-18439ffa8196
+	github.com/swaggest/rest v0.2.1
 )
