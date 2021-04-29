@@ -122,6 +122,11 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 	})
 }
 
+// GetMock exposes mock of external service.
+func (e *External) GetMock(service string) *resttest.ServerMock {
+	return e.mocks[service]
+}
+
 // Add starts a mocked server for a named service and returns url.
 func (e *External) Add(service string, options ...func(mock *resttest.ServerMock)) string {
 	mock, url := resttest.NewServerMock()

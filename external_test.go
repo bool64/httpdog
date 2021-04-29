@@ -25,6 +25,8 @@ func TestRegisterExternal(t *testing.T) {
 	someServiceURL := es.Add("some-service")
 	anotherServiceURL := es.Add("another-service")
 
+	assert.NotNil(t, es.GetMock("some-service"))
+
 	suite := godog.TestSuite{
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
 			es.RegisterSteps(s)
