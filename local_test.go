@@ -1,6 +1,7 @@
 package httpdog_test
 
 import (
+	"io/ioutil"
 	"net/http"
 	"testing"
 
@@ -22,6 +23,10 @@ func TestLocal_RegisterSteps(t *testing.T) {
 	setExpectations(mock, concurrencyLevel)
 
 	local := httpdog.NewLocal(srvURL)
+	local.OnError = func(err error) {
+		assert.NoError(t, err)
+	}
+
 	local.Headers = map[string]string{
 		"X-Foo": "bar",
 	}
@@ -125,4 +130,64 @@ func setExpectations(mock *resttest.ServerMock, concurrencyLevel int) {
 		RequestBody:  []byte(`a,b,c`),
 		ResponseBody: []byte(`a,b,c`),
 	})
+}
+
+func TestLocal_RegisterSteps_unexpectedOtherResp(t *testing.T) {
+	mock, srvURL := resttest.NewServerMock()
+	mock.OnError = func(err error) {
+		assert.NoError(t, err)
+	}
+
+	defer mock.Close()
+
+	concurrencyLevel := 5
+	del := resttest.Expectation{
+		Method:     http.MethodDelete,
+		RequestURI: "/delete-something",
+		Status:     http.StatusNoContent,
+		ResponseHeader: map[string]string{
+			"Content-Type": "application/json",
+		},
+	}
+
+	mock.Expect(del)
+
+	// Due to idempotence testing several more requests should be expected.
+	delNotFound := del
+	delNotFound.Status = http.StatusNotFound
+	delNotFound.ResponseBody = []byte(`{"status":"failed"}`)
+
+	for i := 0; i < concurrencyLevel-1; i++ {
+		mock.Expect(delNotFound)
+	}
+
+	local := httpdog.NewLocal(srvURL)
+	errReceived := false
+
+	local.OnError = func(err error) {
+		errReceived = true
+
+		assert.EqualError(t, err, "no other responses expected: unexpected response status, expected: 204 (No Content), received: 404 (Not Found)")
+	}
+
+	local.ConcurrencyLevel = concurrencyLevel
+
+	suite := godog.TestSuite{
+		ScenarioInitializer: func(s *godog.ScenarioContext) {
+			local.RegisterSteps(s)
+		},
+		Options: &godog.Options{
+			Output: ioutil.Discard,
+			Format: "pretty",
+			Strict: true,
+			Paths:  []string{"_testdata/LocalFail1.feature"},
+		},
+	}
+
+	if suite.Run() != 0 {
+		t.Fatal("test failed")
+	}
+
+	assert.NoError(t, mock.ExpectationsWereMet())
+	assert.True(t, errReceived)
 }
