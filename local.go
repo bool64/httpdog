@@ -29,6 +29,7 @@ func NewLocal(baseURL string) *Local {
 // Local is step-driven HTTP client for application local HTTP service.
 type Local struct {
 	*resttest.Client
+	OnError func(err error)
 }
 
 // RegisterSteps adds HTTP server steps to godog scenario context.
@@ -136,6 +137,18 @@ func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 		}
 	})
 
+	s.AfterScenario(func(s *godog.Scenario, _ error) {
+		if err := l.CheckUnexpectedOtherResponses(); err != nil {
+			err = fmt.Errorf("no other responses expected: %w", err)
+
+			if l.OnError != nil {
+				l.OnError(err)
+			} else {
+				panic(err)
+			}
+		}
+	})
+
 	s.Step(`^I request HTTP endpoint with method "([^"]*)" and URI "([^"]*)"$`, l.iRequestWithMethodAndURI)
 	s.Step(`^I request HTTP endpoint with body$`, l.iRequestWithBody)
 	s.Step(`^I request HTTP endpoint with body from file$`, l.iRequestWithBodyFromFile)
@@ -156,6 +169,10 @@ func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 }
 
 func (l *Local) iRequestWithMethodAndURI(method, uri string) error {
+	if err := l.CheckUnexpectedOtherResponses(); err != nil {
+		return fmt.Errorf("unexpected other responses for previous request: %w", err)
+	}
+
 	l.Reset()
 	l.WithMethod(method)
 	l.WithURI(uri)

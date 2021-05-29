@@ -44,4 +44,8 @@ issues:
         - funlen
         - dupl
       path: "_test.go"
+    - linters:
+        - errcheck
+        - bodyclose
+      path: "example_test.go"
 

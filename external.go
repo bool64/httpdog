@@ -106,17 +106,24 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 	})
 
 	s.AfterScenario(func(s *godog.Scenario, _ error) {
-		if len(e.pending) > 0 && e.OnError != nil {
+		onError := e.OnError
+		if onError == nil {
+			onError = func(err error) {
+				panic(err)
+			}
+		}
+
+		if len(e.pending) > 0 {
 			for service, req := range e.pending {
-				e.OnError(fmt.Errorf("service: %s, %w for: %s %s",
+				onError(fmt.Errorf("service: %s, %w for: %s %s",
 					service, errUndefinedResponse, req.Method, req.RequestURI))
 			}
 		}
 
 		for service, mock := range e.mocks {
 			err := mock.ExpectationsWereMet()
-			if err != nil && e.OnError != nil {
-				e.OnError(fmt.Errorf("service: %s, scenario: %s, expectations were not met: %w", service, s.Name, err))
+			if err != nil {
+				onError(fmt.Errorf("service: %s, scenario: %s, expectations were not met: %w", service, s.Name, err))
 			}
 		}
 	})

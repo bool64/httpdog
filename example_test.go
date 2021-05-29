@@ -3,6 +3,7 @@ package httpdog_test
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 
@@ -12,20 +13,26 @@ import (
 
 func ExampleNewLocal() {
 	external := httpdog.External{}
+	external.OnError = func(err error) {
+		log.Fatal(err)
+	}
 	templateService := external.Add("template-service")
 
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req, _ := http.NewRequest(http.MethodGet, templateService+"/template/hello", nil) // nolint // Handle errors.
-		resp, _ := http.DefaultTransport.RoundTrip(req)                                   // nolint // Handle errors.
-		tpl, _ := ioutil.ReadAll(resp.Body)                                               // nolint // Handle errors.
+		req, _ := http.NewRequest(http.MethodGet, templateService+"/template/hello", nil)
+		resp, _ := http.DefaultTransport.RoundTrip(req)
+		tpl, _ := ioutil.ReadAll(resp.Body)
 
-		_, _ = w.Write([]byte(fmt.Sprintf(string(tpl), r.URL.Query().Get("name")))) // nolint // Handle errors.
+		_, _ = w.Write([]byte(fmt.Sprintf(string(tpl), r.URL.Query().Get("name"))))
 	})
 
 	srv := httptest.NewServer(h)
 	defer srv.Close()
 
 	local := httpdog.NewLocal(srv.URL)
+	local.OnError = func(err error) {
+		log.Fatal(err)
+	}
 
 	suite := godog.TestSuite{
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
