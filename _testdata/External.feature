@@ -18,6 +18,10 @@ Feature: External Services
     {"foo":"bar"}
     """
 
+    And "another-service" request is async
+
+    And "another-service" request is received several times
+
     And "another-service" responds with status "OK" and body
     """
     {"theFooWas":"bar"}

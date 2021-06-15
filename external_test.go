@@ -74,18 +74,22 @@ func callServices(t *testing.T, someServiceURL, anotherServiceURL string) func()
 
 		assertjson.Equal(t, []byte(`{"key":"value"}`), respBody, string(respBody))
 
-		// Hitting `"another-service" receives "POST" request "/post-something" with body`.
-		req, err = http.NewRequest(http.MethodPost, anotherServiceURL+"/post-something", bytes.NewReader([]byte(`{"foo":"bar"}`)))
-		require.NoError(t, err)
+		for i := 0; i < 10; i++ {
+			go func() {
+				// Hitting `"another-service" receives "POST" request "/post-something" with body`.
+				req, err := http.NewRequest(http.MethodPost, anotherServiceURL+"/post-something", bytes.NewReader([]byte(`{"foo":"bar"}`)))
+				require.NoError(t, err)
 
-		resp, err = http.DefaultTransport.RoundTrip(req)
-		require.NoError(t, err)
+				resp, err := http.DefaultTransport.RoundTrip(req)
+				require.NoError(t, err)
 
-		respBody, err = ioutil.ReadAll(resp.Body)
-		require.NoError(t, resp.Body.Close())
-		require.NoError(t, err)
+				respBody, err := ioutil.ReadAll(resp.Body)
+				require.NoError(t, resp.Body.Close())
+				require.NoError(t, err)
 
-		assertjson.Equal(t, []byte(`{"theFooWas":"bar"}`), respBody)
+				assertjson.Equal(t, []byte(`{"theFooWas":"bar"}`), respBody)
+			}()
+		}
 
 		// Hitting `"some-service" responds with status "OK" and body`.
 		req, err = http.NewRequest(http.MethodGet, someServiceURL+"/does-not-matter", nil)
