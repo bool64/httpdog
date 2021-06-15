@@ -182,6 +182,14 @@ Or to be unlimited.
 And "some-service" request is received several times
 ```
 
+By default, requests are expected in same sequential order as they are defined.
+If there is no stable order you can have an async expectation.
+Async requests are expected in any order.
+
+```gherkin
+And "some-service" request is async
+```
+
 Response may have a header.
 
 ```gherkin

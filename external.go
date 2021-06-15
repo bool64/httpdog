@@ -8,9 +8,14 @@ import (
 	"github.com/swaggest/rest/resttest"
 )
 
+type exp struct {
+	resttest.Expectation
+	async bool
+}
+
 // External is a collection of step-driven HTTP servers to serve requests of application with mocked data.
 type External struct {
-	pending map[string]resttest.Expectation
+	pending map[string]exp
 	mocks   map[string]*resttest.ServerMock
 
 	OnError func(err error)
@@ -55,6 +60,12 @@ type External struct {
 //
 //		And "some-service" request is received several times
 //
+// By default, requests are expected in same sequential order as they are defined.
+// If there is no stable order you can have an async expectation.
+// Async requests are expected in any order.
+//
+//		And "some-service" request is async
+//
 // Response may have a header.
 //
 //		And "some-service" response includes header "X-Bar: foo"
@@ -73,7 +84,7 @@ type External struct {
 //		_testdata/sample.json5
 //		"""
 func (e *External) RegisterSteps(s *godog.ScenarioContext) {
-	e.pending = make(map[string]resttest.Expectation, len(e.mocks))
+	e.pending = make(map[string]exp, len(e.mocks))
 
 	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)"$`,
 		e.serviceReceivesRequest)
@@ -83,6 +94,8 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 		e.serviceReceivesRequestWithBodyFromFile)
 	s.Step(`^"([^"]*)" request includes header "([^"]*): ([^"]*)"$`,
 		e.serviceRequestIncludesHeader)
+	s.Step(`^"([^"]*)" request is async$`,
+		e.serviceRequestIsAsync)
 	s.Step(`^"([^"]*)" request is received several times$`,
 		e.serviceReceivesRequestMultipleTimes)
 	s.Step(`^"([^"]*)" request is received (\d+) times$`,
@@ -224,6 +237,18 @@ func (e *External) serviceReceivesRequestNTimes(service string, n int) error {
 	return nil
 }
 
+func (e *External) serviceRequestIsAsync(service string) error {
+	if _, ok := e.mocks[service]; !ok {
+		return fmt.Errorf("%w: %q", errNoMockForService, service)
+	}
+
+	pending := e.pending[service]
+	pending.async = true
+	e.pending[service] = pending
+
+	return nil
+}
+
 func (e *External) serviceReceivesRequestMultipleTimes(service string) error {
 	if _, ok := e.mocks[service]; !ok {
 		return fmt.Errorf("%w: %q", errNoMockForService, service)
@@ -257,7 +282,11 @@ func (e *External) serviceRespondsWithStatusAndPreparedBody(service, statusOrCod
 		pending.ResponseHeader = map[string]string{}
 	}
 
-	m.Expect(pending)
+	if pending.async {
+		m.ExpectAsync(pending.Expectation)
+	} else {
+		m.Expect(pending.Expectation)
+	}
 
 	return nil
 }
