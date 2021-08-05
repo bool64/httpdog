@@ -12,7 +12,7 @@ Feature: External Services
     {"key":"value"}
     """
 
-    And "another-service" receives "POST" request "/post-something" with body
+    Given "another-service" receives "POST" request "/post-something" with body
     """
     // Could be a JSON5 too.
     {"foo":"bar"}
@@ -27,13 +27,19 @@ Feature: External Services
     {"theFooWas":"bar"}
     """
 
+    Given "some-service" receives "GET" request "/no-response-body"
+
+    And "some-service" responds with status "OK"
+
+    Given "some-service" receives "GET" request "/ask-for-foo"
+
     And "some-service" responds with status "OK" and body
     """
     "foo"
     """
 
     # Request with undefined response.
-    And "some-service" receives "GET" request "/never-called"
+    Given "some-service" receives "GET" request "/never-called"
 
     # Request that will remain unused after scenario.
     And "another-service" receives "POST" request "/post-something" with body from file

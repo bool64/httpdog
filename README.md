@@ -182,9 +182,8 @@ Or to be unlimited.
 And "some-service" request is received several times
 ```
 
-By default, requests are expected in same sequential order as they are defined.
-If there is no stable order you can have an async expectation.
-Async requests are expected in any order.
+By default, requests are expected in same sequential order as they are defined. If there is no stable order you can have
+an async expectation. Async requests are expected in any order.
 
 ```gherkin
 And "some-service" request is async
@@ -196,7 +195,13 @@ Response may have a header.
 And "some-service" response includes header "X-Bar: foo"
 ```
 
-Response must have status and body (body can be empty).
+Response must have a status.
+
+```gherkin
+And "some-service" responds with status "OK"
+```
+
+Response may also have a body.
 
 ```gherkin
 And "some-service" responds with status "OK" and body

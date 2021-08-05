@@ -47,7 +47,7 @@ func TestRegisterExternal(t *testing.T) {
 	}
 
 	assert.Equal(t, []string{
-		"service: some-service, undefined response for: GET /never-called",
+		"service: some-service, undefined response (missing `responds with status <STATUS>` step) for: GET /never-called",
 		"service: another-service, scenario: Successful Request, expectations were not met: " +
 			"there are remaining expectations that were not met: POST /post-something",
 	}, errs)
@@ -91,8 +91,20 @@ func callServices(t *testing.T, someServiceURL, anotherServiceURL string) func()
 			}()
 		}
 
+		// Hitting `"some-service" responds with status "OK"`.
+		req, err = http.NewRequest(http.MethodGet, someServiceURL+"/no-response-body", nil)
+		require.NoError(t, err)
+
+		resp, err = http.DefaultTransport.RoundTrip(req)
+		require.NoError(t, err)
+
+		respBody, err = ioutil.ReadAll(resp.Body)
+		require.NoError(t, resp.Body.Close())
+		require.NoError(t, err)
+		require.Empty(t, respBody)
+
 		// Hitting `"some-service" responds with status "OK" and body`.
-		req, err = http.NewRequest(http.MethodGet, someServiceURL+"/does-not-matter", nil)
+		req, err = http.NewRequest(http.MethodGet, someServiceURL+"/ask-for-foo", nil)
 		require.NoError(t, err)
 
 		resp, err = http.DefaultTransport.RoundTrip(req)

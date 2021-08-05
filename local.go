@@ -232,7 +232,8 @@ func (l *Local) iRequestWithCookie(name, value string) error {
 var (
 	errUnknownStatusCode = errors.New("unknown http status")
 	errNoMockForService  = errors.New("no mock for service")
-	errUndefinedResponse = errors.New("undefined response")
+	errUndefinedRequest  = errors.New("undefined request (missing `receives <METHOD> request` step)")
+	errUndefinedResponse = errors.New("undefined response (missing `responds with status <STATUS>` step)")
 )
 
 func statusCode(statusOrCode string) (int, error) {
