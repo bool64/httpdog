@@ -70,7 +70,11 @@ type External struct {
 //
 //		And "some-service" response includes header "X-Bar: foo"
 //
-// Response must have status and body (body can be empty).
+// Response must have a status.
+//
+//		And "some-service" responds with status "OK"
+//
+// Response may also have a body.
 //
 //		And "some-service" responds with status "OK" and body
 //		"""
@@ -86,27 +90,7 @@ type External struct {
 func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 	e.pending = make(map[string]exp, len(e.mocks))
 
-	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)"$`,
-		e.serviceReceivesRequest)
-	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)" with body$`,
-		e.serviceReceivesRequestWithBody)
-	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)" with body from file$`,
-		e.serviceReceivesRequestWithBodyFromFile)
-	s.Step(`^"([^"]*)" request includes header "([^"]*): ([^"]*)"$`,
-		e.serviceRequestIncludesHeader)
-	s.Step(`^"([^"]*)" request is async$`,
-		e.serviceRequestIsAsync)
-	s.Step(`^"([^"]*)" request is received several times$`,
-		e.serviceReceivesRequestMultipleTimes)
-	s.Step(`^"([^"]*)" request is received (\d+) times$`,
-		e.serviceReceivesRequestNTimes)
-
-	s.Step(`^"([^"]*)" response includes header "([^"]*): ([^"]*)"$`,
-		e.serviceResponseIncludesHeader)
-	s.Step(`^"([^"]*)" responds with status "([^"]*)" and body$`,
-		e.serviceRespondsWithStatusAndBody)
-	s.Step(`^"([^"]*)" responds with status "([^"]*)" and body from file$`,
-		e.serviceRespondsWithStatusAndBodyFromFile)
+	e.steps(s)
 
 	s.BeforeScenario(func(i *godog.Scenario) {
 		for _, mock := range e.mocks {
@@ -140,6 +124,40 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 			}
 		}
 	})
+}
+
+func (e *External) steps(s *godog.ScenarioContext) {
+	// Init request expectation.
+	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)"$`,
+		e.serviceReceivesRequest)
+	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)" with body$`,
+		e.serviceReceivesRequestWithBody)
+	s.Step(`^"([^"]*)" receives "([^"]*)" request "([^"]*)" with body from file$`,
+		e.serviceReceivesRequestWithBodyFromFile)
+
+	// Configure request expectation.
+	s.Step(`^"([^"]*)" request includes header "([^"]*): ([^"]*)"$`,
+		e.serviceRequestIncludesHeader)
+	s.Step(`^"([^"]*)" request is async$`,
+		e.serviceRequestIsAsync)
+	s.Step(`^"([^"]*)" request is received several times$`,
+		e.serviceReceivesRequestMultipleTimes)
+	s.Step(`^"([^"]*)" request is received (\d+) times$`,
+		e.serviceReceivesRequestNTimes)
+
+	// Configure response.
+	s.Step(`^"([^"]*)" response includes header "([^"]*): ([^"]*)"$`,
+		e.serviceResponseIncludesHeader)
+
+	// Finalize request expectation.
+	s.Step(`^"([^"]*)" responds with status "([^"]*)"$`,
+		func(service, statusOrCode string) error {
+			return e.serviceRespondsWithStatusAndPreparedBody(service, statusOrCode, nil)
+		})
+	s.Step(`^"([^"]*)" responds with status "([^"]*)" and body$`,
+		e.serviceRespondsWithStatusAndBody)
+	s.Step(`^"([^"]*)" responds with status "([^"]*)" and body from file$`,
+		e.serviceRespondsWithStatusAndBodyFromFile)
 }
 
 // GetMock exposes mock of external service.
@@ -183,6 +201,10 @@ func (e *External) serviceReceivesRequestWithPreparedBody(service, method, reque
 
 func (e *External) serviceRequestIncludesHeader(service, header, value string) error {
 	pending := e.pending[service]
+
+	if pending.Method == "" {
+		return fmt.Errorf("%w: %q", errUndefinedRequest, service)
+	}
 
 	if pending.RequestHeader == nil {
 		pending.RequestHeader = make(map[string]string, 1)
@@ -231,6 +253,11 @@ func (e *External) serviceReceivesRequestNTimes(service string, n int) error {
 	}
 
 	pending := e.pending[service]
+
+	if pending.Method == "" {
+		return fmt.Errorf("%w: %q", errUndefinedRequest, service)
+	}
+
 	pending.Repeated = n
 	e.pending[service] = pending
 
@@ -243,6 +270,11 @@ func (e *External) serviceRequestIsAsync(service string) error {
 	}
 
 	pending := e.pending[service]
+
+	if pending.Method == "" {
+		return fmt.Errorf("%w: %q", errUndefinedRequest, service)
+	}
+
 	pending.async = true
 	e.pending[service] = pending
 
@@ -255,6 +287,11 @@ func (e *External) serviceReceivesRequestMultipleTimes(service string) error {
 	}
 
 	pending := e.pending[service]
+
+	if pending.Method == "" {
+		return fmt.Errorf("%w: %q", errUndefinedRequest, service)
+	}
+
 	pending.Unlimited = true
 	e.pending[service] = pending
 
@@ -273,6 +310,11 @@ func (e *External) serviceRespondsWithStatusAndPreparedBody(service, statusOrCod
 	}
 
 	pending := e.pending[service]
+
+	if pending.Method == "" {
+		return fmt.Errorf("%w: %q", errUndefinedRequest, service)
+	}
+
 	delete(e.pending, service)
 
 	pending.Status = code
@@ -298,6 +340,11 @@ func (e *External) serviceResponseIncludesHeader(service, header, value string) 
 	}
 
 	pending := e.pending[service]
+
+	if pending.Method == "" {
+		return fmt.Errorf("%w: %q", errUndefinedRequest, service)
+	}
+
 	if pending.ResponseHeader == nil {
 		pending.ResponseHeader = make(map[string]string, 1)
 	}
