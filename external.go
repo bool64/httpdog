@@ -1,6 +1,7 @@
 package httpdog
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/bool64/shared"
@@ -92,7 +93,7 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 
 	e.steps(s)
 
-	s.BeforeScenario(func(i *godog.Scenario) {
+	s.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		for _, mock := range e.mocks {
 			mock.ResetExpectations()
 		}
@@ -100,29 +101,29 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 		if e.Vars != nil {
 			e.Vars.Reset()
 		}
+
+		return ctx, nil
 	})
 
-	s.AfterScenario(func(s *godog.Scenario, _ error) {
-		onError := e.OnError
-		if onError == nil {
-			onError = func(err error) {
-				panic(err)
-			}
+	s.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
+		if err != nil {
+			return ctx, nil
 		}
 
 		if len(e.pending) > 0 {
 			for service, req := range e.pending {
-				onError(fmt.Errorf("service: %s, %w for: %s %s",
-					service, errUndefinedResponse, req.Method, req.RequestURI))
+				return ctx, fmt.Errorf("service: %s, %w for: %s %s", service, errUndefinedResponse, req.Method, req.RequestURI)
 			}
 		}
 
 		for service, mock := range e.mocks {
 			err := mock.ExpectationsWereMet()
 			if err != nil {
-				onError(fmt.Errorf("service: %s, scenario: %s, expectations were not met: %w", service, s.Name, err))
+				return ctx, fmt.Errorf("service: %s, expectations were not met: %w", service, err)
 			}
 		}
+
+		return ctx, nil
 	})
 }
 

@@ -1,6 +1,7 @@
 package httpdog
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -137,16 +138,18 @@ func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 		}
 	})
 
-	s.AfterScenario(func(s *godog.Scenario, _ error) {
+	s.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
+		if err != nil {
+			return ctx, nil
+		}
+
 		if err := l.CheckUnexpectedOtherResponses(); err != nil {
 			err = fmt.Errorf("no other responses expected: %w", err)
 
-			if l.OnError != nil {
-				l.OnError(err)
-			} else {
-				panic(err)
-			}
+			return ctx, err
 		}
+
+		return ctx, nil
 	})
 
 	s.Step(`^I request HTTP endpoint with method "([^"]*)" and URI "([^"]*)"$`, l.iRequestWithMethodAndURI)
