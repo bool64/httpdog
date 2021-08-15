@@ -217,7 +217,7 @@ func (e *External) serviceRequestIncludesHeader(service, header, value string) e
 }
 
 func (e *External) serviceReceivesRequestWithBody(service, method, requestURI string, bodyDoc *godog.DocString) error {
-	body, err := loadBody([]byte(bodyDoc.Content))
+	body, err := loadBody([]byte(bodyDoc.Content), e.Vars)
 	if err != nil {
 		return err
 	}
@@ -226,7 +226,7 @@ func (e *External) serviceReceivesRequestWithBody(service, method, requestURI st
 }
 
 func (e *External) serviceReceivesRequestWithBodyFromFile(service, method, requestURI string, filePath *godog.DocString) error {
-	body, err := loadBodyFromFile(filePath.Content)
+	body, err := loadBodyFromFile(filePath.Content, e.Vars)
 	if err != nil {
 		return err
 	}
@@ -356,7 +356,7 @@ func (e *External) serviceResponseIncludesHeader(service, header, value string) 
 }
 
 func (e *External) serviceRespondsWithStatusAndBody(service, statusOrCode string, bodyDoc *godog.DocString) error {
-	body, err := loadBody([]byte(bodyDoc.Content))
+	body, err := loadBody([]byte(bodyDoc.Content), e.Vars)
 	if err != nil {
 		return err
 	}
@@ -365,7 +365,7 @@ func (e *External) serviceRespondsWithStatusAndBody(service, statusOrCode string
 }
 
 func (e *External) serviceRespondsWithStatusAndBodyFromFile(service, statusOrCode string, filePath *godog.DocString) error {
-	body, err := loadBodyFromFile(filePath.Content)
+	body, err := loadBodyFromFile(filePath.Content, e.Vars)
 	if err != nil {
 		return err
 	}

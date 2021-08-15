@@ -1,6 +1,8 @@
 package httpdog
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -8,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/bool64/shared"
 	"github.com/cucumber/godog"
 	"github.com/swaggest/assertjson/json5"
 	"github.com/swaggest/rest/resttest"
@@ -21,9 +24,13 @@ func NewLocal(baseURL string) *Local {
 
 	baseURL = strings.TrimRight(baseURL, "/")
 
-	return &Local{
+	l := Local{
 		Client: resttest.NewClient(baseURL),
 	}
+
+	l.JSONComparer.Vars = &shared.Vars{}
+
+	return &l
 }
 
 // Local is step-driven HTTP client for application local HTTP service.
@@ -180,25 +187,40 @@ func (l *Local) iRequestWithMethodAndURI(method, uri string) error {
 	return nil
 }
 
-func loadBodyFromFile(filePath string) ([]byte, error) {
+func loadBodyFromFile(filePath string, vars *shared.Vars) ([]byte, error) {
 	body, err := ioutil.ReadFile(filePath) // nolint:gosec // File inclusion via variable during tests.
 	if err != nil {
 		return nil, err
 	}
 
-	return loadBody(body)
+	return loadBody(body, vars)
 }
 
-func loadBody(body []byte) ([]byte, error) {
+func loadBody(body []byte, vars *shared.Vars) ([]byte, error) {
+	var err error
+
 	if json5.Valid(body) {
-		return json5.Downgrade(body)
+		if body, err = json5.Downgrade(body); err != nil {
+			return nil, fmt.Errorf("failed to downgrade JSON5 to JSON: %w", err)
+		}
+	}
+
+	if vars != nil {
+		for k, v := range vars.GetAll() {
+			jv, err := json.Marshal(v)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal var %s (%v): %w", k, v, err)
+			}
+
+			body = bytes.ReplaceAll(body, []byte(`"`+k+`"`), jv)
+		}
 	}
 
 	return body, nil
 }
 
 func (l *Local) iRequestWithBodyFromFile(filePath *godog.DocString) error {
-	body, err := loadBodyFromFile(filePath.Content)
+	body, err := loadBodyFromFile(filePath.Content, l.JSONComparer.Vars)
 
 	if err == nil {
 		l.WithBody(body)
@@ -208,7 +230,7 @@ func (l *Local) iRequestWithBodyFromFile(filePath *godog.DocString) error {
 }
 
 func (l *Local) iRequestWithBody(bodyDoc *godog.DocString) error {
-	body, err := loadBody([]byte(bodyDoc.Content))
+	body, err := loadBody([]byte(bodyDoc.Content), l.JSONComparer.Vars)
 
 	if err == nil {
 		l.WithBody(body)
@@ -281,7 +303,7 @@ func (l *Local) iShouldHaveResponseWithHeader(key, value string) error {
 }
 
 func (l *Local) iShouldHaveResponseWithBody(bodyDoc *godog.DocString) error {
-	body, err := loadBody([]byte(bodyDoc.Content))
+	body, err := loadBody([]byte(bodyDoc.Content), l.JSONComparer.Vars)
 	if err != nil {
 		return err
 	}
@@ -290,7 +312,7 @@ func (l *Local) iShouldHaveResponseWithBody(bodyDoc *godog.DocString) error {
 }
 
 func (l *Local) iShouldHaveResponseWithBodyFromFile(filePath *godog.DocString) error {
-	body, err := loadBodyFromFile(filePath.Content)
+	body, err := loadBodyFromFile(filePath.Content, l.JSONComparer.Vars)
 	if err != nil {
 		return err
 	}
@@ -299,7 +321,7 @@ func (l *Local) iShouldHaveResponseWithBodyFromFile(filePath *godog.DocString) e
 }
 
 func (l *Local) iShouldHaveOtherResponsesWithBody(bodyDoc *godog.DocString) error {
-	body, err := loadBody([]byte(bodyDoc.Content))
+	body, err := loadBody([]byte(bodyDoc.Content), l.JSONComparer.Vars)
 	if err != nil {
 		return err
 	}
@@ -308,7 +330,7 @@ func (l *Local) iShouldHaveOtherResponsesWithBody(bodyDoc *godog.DocString) erro
 }
 
 func (l *Local) iShouldHaveOtherResponsesWithBodyFromFile(filePath *godog.DocString) error {
-	body, err := loadBodyFromFile(filePath.Content)
+	body, err := loadBodyFromFile(filePath.Content, l.JSONComparer.Vars)
 	if err != nil {
 		return err
 	}

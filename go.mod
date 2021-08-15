@@ -7,6 +7,6 @@ require (
 	github.com/bool64/shared v0.1.3
 	github.com/cucumber/godog v0.11.0
 	github.com/stretchr/testify v1.7.0
-	github.com/swaggest/assertjson v1.6.6
+	github.com/swaggest/assertjson v1.6.7
 	github.com/swaggest/rest v0.2.11
 )
