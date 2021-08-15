@@ -233,5 +233,4 @@ func TestLocal_RegisterSteps_dynamic(t *testing.T) {
 	if suite.Run() != 0 {
 		t.Fatal("test failed")
 	}
-
 }
