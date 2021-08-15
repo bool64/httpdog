@@ -8,12 +8,12 @@ Feature: External Services
     And "some-service" response includes header "X-Bar: foo"
 
     And "some-service" responds with status "OK" and body
-    """
+    """json
     {"key":"value"}
     """
 
     Given "another-service" receives "POST" request "/post-something" with body
-    """
+    """json5
     // Could be a JSON5 too.
     {"foo":"bar"}
     """
@@ -23,7 +23,7 @@ Feature: External Services
     And "another-service" request is received several times
 
     And "another-service" responds with status "OK" and body
-    """
+    """json
     {"theFooWas":"bar"}
     """
 
@@ -34,7 +34,7 @@ Feature: External Services
     Given "some-service" receives "GET" request "/ask-for-foo"
 
     And "some-service" responds with status "OK" and body
-    """
+    """json
     "foo"
     """
 

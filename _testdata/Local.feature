@@ -6,7 +6,7 @@ Feature: HTTP Service
     Then I should have response with status "OK"
 
     And I should have response with body
-    """
+    """json
     [
       {"some":"json"}
     ]
@@ -41,7 +41,7 @@ Feature: HTTP Service
     """
 
     Then I should have response with body
-    """
+    """json
     {"status":"ok"}
     """
 
@@ -63,7 +63,7 @@ Feature: HTTP Service
     And I should have other responses with status "Not Found"
 
     And I should have other responses with body
-    """
+    """json
     {"status":"failed"}
     """
 
@@ -73,7 +73,7 @@ Feature: HTTP Service
     When I request HTTP endpoint with method "POST" and URI "/with-json5-body"
 
     And I request HTTP endpoint with body
-    """
+    """json5
     [
       // some test data
       {"some":"json5"}

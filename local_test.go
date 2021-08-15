@@ -3,6 +3,7 @@ package httpdog_test
 import (
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/bool64/httpdog"
@@ -190,4 +191,47 @@ func TestLocal_RegisterSteps_unexpectedOtherResp(t *testing.T) {
 
 	assert.NoError(t, mock.ExpectationsWereMet())
 	assert.True(t, errReceived)
+}
+
+func TestLocal_RegisterSteps_dynamic(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/user" {
+			_, err := w.Write([]byte(`{"id":12345,"name": "John Doe","created_at":"any","updated_at": "any"}`))
+			assert.NoError(t, err)
+
+			return
+		}
+
+		if r.URL.Path == "/order" {
+			b, err := ioutil.ReadAll(r.Body)
+			assert.NoError(t, err)
+			assert.NoError(t, r.Body.Close())
+
+			assert.Equal(t, `{"user_id":12345,"item_name":"Watermelon"}`, string(b))
+
+			_, err = w.Write([]byte(`{"id":54321,"created_at":"any","updated_at": "any","user_id":12345}`))
+			assert.NoError(t, err)
+
+			return
+		}
+	}))
+	defer srv.Close()
+
+	local := httpdog.NewLocal(srv.URL)
+
+	suite := godog.TestSuite{
+		ScenarioInitializer: func(s *godog.ScenarioContext) {
+			local.RegisterSteps(s)
+		},
+		Options: &godog.Options{
+			Format: "pretty",
+			Strict: true,
+			Paths:  []string{"_testdata/Dynamic.feature"},
+		},
+	}
+
+	if suite.Run() != 0 {
+		t.Fatal("test failed")
+	}
+
 }
