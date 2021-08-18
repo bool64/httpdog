@@ -2,6 +2,7 @@ package httpdog
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -36,7 +37,6 @@ func NewLocal(baseURL string) *Local {
 // Local is step-driven HTTP client for application local HTTP service.
 type Local struct {
 	*resttest.Client
-	OnError func(err error)
 }
 
 // RegisterSteps adds HTTP server steps to godog scenario context.
@@ -136,24 +136,24 @@ type Local struct {
 //		path/to/file.json
 //		"""
 func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
-	s.BeforeScenario(func(_ *godog.Scenario) {
+	s.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 		l.Reset()
 
 		if l.JSONComparer.Vars != nil {
 			l.JSONComparer.Vars.Reset()
 		}
+
+		return ctx, nil
 	})
 
-	s.AfterScenario(func(s *godog.Scenario, _ error) {
+	s.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
 		if err := l.CheckUnexpectedOtherResponses(); err != nil {
 			err = fmt.Errorf("no other responses expected: %w", err)
 
-			if l.OnError != nil {
-				l.OnError(err)
-			} else {
-				panic(err)
-			}
+			return ctx, err
 		}
+
+		return ctx, nil
 	})
 
 	s.Step(`^I request HTTP endpoint with method "([^"]*)" and URI "([^"]*)"$`, l.iRequestWithMethodAndURI)
