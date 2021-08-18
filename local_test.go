@@ -1,6 +1,7 @@
 package httpdog_test
 
 import (
+	"bytes"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -24,10 +25,6 @@ func TestLocal_RegisterSteps(t *testing.T) {
 	setExpectations(mock, concurrencyLevel)
 
 	local := httpdog.NewLocal(srvURL)
-	local.OnError = func(err error) {
-		assert.NoError(t, err)
-	}
-
 	local.Headers = map[string]string{
 		"X-Foo": "bar",
 	}
@@ -163,34 +160,25 @@ func TestLocal_RegisterSteps_unexpectedOtherResp(t *testing.T) {
 	}
 
 	local := httpdog.NewLocal(srvURL)
-	errReceived := false
-
-	local.OnError = func(err error) {
-		errReceived = true
-
-		assert.EqualError(t, err, "no other responses expected: unexpected response status, expected: 204 (No Content), received: 404 (Not Found)")
-	}
-
 	local.ConcurrencyLevel = concurrencyLevel
+	out := bytes.NewBuffer(nil)
 
 	suite := godog.TestSuite{
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
 			local.RegisterSteps(s)
 		},
 		Options: &godog.Options{
-			Output: ioutil.Discard,
-			Format: "pretty",
-			Strict: true,
-			Paths:  []string{"_testdata/LocalFail1.feature"},
+			Output:   out,
+			Format:   "pretty",
+			NoColors: true,
+			Strict:   true,
+			Paths:    []string{"_testdata/LocalFail1.feature"},
 		},
 	}
 
-	if suite.Run() != 0 {
-		t.Fatal("test failed")
-	}
-
+	assert.Equal(t, 1, suite.Run())
 	assert.NoError(t, mock.ExpectationsWereMet())
-	assert.True(t, errReceived)
+	assert.Contains(t, out.String(), "Error: after scenario hook failed: no other responses expected: unexpected response status, expected: 204 (No Content), received: 404 (Not Found)")
 }
 
 func TestLocal_RegisterSteps_dynamic(t *testing.T) {

@@ -134,6 +134,11 @@ And I should have other responses with header "X-Header: abc"
 
 ### External Services
 
+External Services mock creates a HTTP server for each of registered services and allows control of expected 
+requests and responses with gherkin steps. Please note, due to centralized nature of these mocks they can not be 
+used from concurrent scenarios, 
+so keep [`Concurrency`](https://pkg.go.dev/github.com/cucumber/godog@v0.12.0/internal/flags#Options) at 0 or 1. 
+
 In simple case you can define expected URL and response.
 
 ```gherkin

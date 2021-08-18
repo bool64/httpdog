@@ -17,15 +17,12 @@ import (
 func TestRegisterExternal(t *testing.T) {
 	es := httpdog.External{}
 
-	errs := []string{}
-	es.OnError = func(err error) {
-		errs = append(errs, err.Error())
-	}
-
 	someServiceURL := es.Add("some-service")
 	anotherServiceURL := es.Add("another-service")
 
 	assert.NotNil(t, es.GetMock("some-service"))
+
+	out := bytes.NewBuffer(nil)
 
 	suite := godog.TestSuite{
 		ScenarioInitializer: func(s *godog.ScenarioContext) {
@@ -36,21 +33,19 @@ func TestRegisterExternal(t *testing.T) {
 		},
 		Options: &godog.Options{
 			Format:    "pretty",
+			Output:    out,
+			NoColors:  true,
 			Strict:    true,
 			Paths:     []string{"_testdata/External.feature"},
 			Randomize: time.Now().UTC().UnixNano(),
 		},
 	}
 
-	if suite.Run() != 0 {
-		t.Fatal("unexpected error")
-	}
+	assert.Equal(t, 1, suite.Run())
 
-	assert.Equal(t, []string{
-		"service: some-service, undefined response (missing `responds with status <STATUS>` step) for: GET /never-called",
-		"service: another-service, scenario: Successful Request, expectations were not met: " +
-			"there are remaining expectations that were not met: POST /post-something",
-	}, errs)
+	assert.Contains(t, out.String(), "Error: after scenario hook failed: check failed for external services:\n"+
+		"undefined response (missing `responds with status <STATUS>` step) in some-service for GET /never-called,\n"+
+		"expectations were not met for another-service: there are remaining expectations that were not met: POST /post-something")
 }
 
 func callServices(t *testing.T, someServiceURL, anotherServiceURL string) func() error {

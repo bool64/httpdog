@@ -3,7 +3,6 @@ package httpdog_test
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httptest"
 
@@ -13,9 +12,6 @@ import (
 
 func ExampleNewLocal() {
 	external := httpdog.External{}
-	external.OnError = func(err error) {
-		log.Fatal(err)
-	}
 	templateService := external.Add("template-service")
 
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -30,9 +26,6 @@ func ExampleNewLocal() {
 	defer srv.Close()
 
 	local := httpdog.NewLocal(srv.URL)
-	local.OnError = func(err error) {
-		log.Fatal(err)
-	}
 
 	suite := godog.TestSuite{
 		ScenarioInitializer: func(s *godog.ScenarioContext) {

@@ -1,7 +1,10 @@
 package httpdog
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/bool64/shared"
 	"github.com/cucumber/godog"
@@ -18,8 +21,7 @@ type External struct {
 	pending map[string]exp
 	mocks   map[string]*resttest.ServerMock
 
-	OnError func(err error)
-	Vars    *shared.Vars
+	Vars *shared.Vars
 }
 
 // RegisterSteps adds steps to godog scenario context to serve outgoing requests with mocked data.
@@ -92,7 +94,7 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 
 	e.steps(s)
 
-	s.BeforeScenario(func(i *godog.Scenario) {
+	s.Before(func(ctx context.Context, sc *godog.Scenario) (context.Context, error) {
 		for _, mock := range e.mocks {
 			mock.ResetExpectations()
 		}
@@ -100,29 +102,31 @@ func (e *External) RegisterSteps(s *godog.ScenarioContext) {
 		if e.Vars != nil {
 			e.Vars.Reset()
 		}
+
+		return ctx, nil
 	})
 
-	s.AfterScenario(func(s *godog.Scenario, _ error) {
-		onError := e.OnError
-		if onError == nil {
-			onError = func(err error) {
-				panic(err)
-			}
-		}
+	s.After(func(ctx context.Context, sc *godog.Scenario, err error) (context.Context, error) {
+		var errs []string
 
 		if len(e.pending) > 0 {
 			for service, req := range e.pending {
-				onError(fmt.Errorf("service: %s, %w for: %s %s",
-					service, errUndefinedResponse, req.Method, req.RequestURI))
+				errs = append(errs, fmt.Sprintf("%s in %s for %s %s",
+					errUndefinedResponse, service, req.Method, req.RequestURI))
 			}
 		}
 
 		for service, mock := range e.mocks {
-			err := mock.ExpectationsWereMet()
-			if err != nil {
-				onError(fmt.Errorf("service: %s, scenario: %s, expectations were not met: %w", service, s.Name, err))
+			if err := mock.ExpectationsWereMet(); err != nil {
+				errs = append(errs, fmt.Sprintf("expectations were not met for %s: %s", service, err))
 			}
 		}
+
+		if len(errs) > 0 {
+			return ctx, errors.New("check failed for external services:\n" + strings.Join(errs, ",\n"))
+		}
+
+		return ctx, nil
 	})
 }
 
@@ -169,7 +173,6 @@ func (e *External) GetMock(service string) *resttest.ServerMock {
 func (e *External) Add(service string, options ...func(mock *resttest.ServerMock)) string {
 	mock, url := resttest.NewServerMock()
 
-	mock.OnError = e.OnError
 	mock.JSONComparer.Vars = e.Vars
 
 	for _, option := range options {
