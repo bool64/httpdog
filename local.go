@@ -156,7 +156,7 @@ func (l *Local) RegisterSteps(s *godog.ScenarioContext) {
 		return ctx, nil
 	})
 
-	s.Step(`^I request HTTP endpoint with method "([^"]*)" and URI "([^"]*)"$`, l.iRequestWithMethodAndURI)
+	s.Step(`^I request HTTP endpoint with method "([^"]*)" and URI (.*)$`, l.iRequestWithMethodAndURI)
 	s.Step(`^I request HTTP endpoint with body$`, l.iRequestWithBody)
 	s.Step(`^I request HTTP endpoint with body from file$`, l.iRequestWithBodyFromFile)
 	s.Step(`^I request HTTP endpoint with header "([^"]*): ([^"]*)"$`, l.iRequestWithHeader)
@@ -179,6 +179,8 @@ func (l *Local) iRequestWithMethodAndURI(method, uri string) error {
 	if err := l.CheckUnexpectedOtherResponses(); err != nil {
 		return fmt.Errorf("unexpected other responses for previous request: %w", err)
 	}
+
+	uri = strings.Trim(uri, `"`)
 
 	l.Reset()
 	l.WithMethod(method)
