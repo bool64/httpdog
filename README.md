@@ -1,3 +1,5 @@
+# This repository has moved and is maintained at [`github.com/godogx/httpsteps`](https://github.com/godogx/httpsteps).
+
 # Cucumber HTTP steps for Go
 
 [![Build Status](https://github.com/bool64/httpdog/workflows/test-unit/badge.svg)](https://github.com/bool64/httpdog/actions?query=branch%3Amaster+workflow%3Atest-unit)
